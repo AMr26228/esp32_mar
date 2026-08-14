@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
@@ -19,6 +20,10 @@ def get_ai_response(text: str) -> str:
         return "Hôm nay thời tiết rất đẹp, rất thích hợp để trò chuyện!"
     else:
         return f"Cảm ơn bạn đã hỏi. Mình nghe rõ câu hỏi: {text}"
+
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "Server Robot AI dang chay!"}
 
 @app.post("/ask")
 async def ask_question(data: QuestionRequest):
@@ -42,3 +47,9 @@ async def get_audio():
         return StreamingResponse(audio_bytes, media_type="audio/mpeg")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+if __name__ == "__main__":
+    import uvicorn
+    # Lấy cổng tự động do Render cấp (Môi trường Render bắt buộc dòng này)
+    port = int(os.environ.get("PORT", 10000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
